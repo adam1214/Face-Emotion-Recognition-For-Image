@@ -35,7 +35,7 @@ from PIL import Image
 import torch.nn.functional as F
 
 #os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-model = getattr(model, 'resmasking_dropout1')
+model = getattr(model,'googlenet')
 model = model(in_channels=3, num_classes=7)
 
 #Detecting face emotion on input image
