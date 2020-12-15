@@ -34,9 +34,7 @@ from torchvision.transforms import transforms
 from PIL import Image
 import torch.nn.functional as F
 
-#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-model = getattr(model,'googlenet')
-model = model(in_channels=3, num_classes=7)
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 #Detecting face emotion on input image
 
@@ -50,6 +48,7 @@ def fun(in_path, out_image_path,
     .csv files will be saved in fer_result folder.
     only process the image that its resolution is 720p and above(image_resolution = 720, can be adjusted)
     """
+    global model, F
     detect_emo = True
 
     #save config
@@ -65,12 +64,17 @@ def fun(in_path, out_image_path,
     # parameters for loading data and images
     detection_model_path = model_path +  '/haarcascade_frontalface_default.xml'
     if detect_emo:
-        emotion_model_path = model_path + '/googlenet__googlenetwei__2020Aug29_16.21'
+        emotion_model_path = model_path + '/resmasking_dropout1__resmasking_dropout1_128_2020Aug29_21.55'
         emotion_labels = get_labels('fer2013')
+        print(emotion_labels)
         emotion_offsets = (20, 40)
-        # loading models
 
-        state = torch.load(emotion_model_path, map_location='cpu' )
+        # loading models
+        model = getattr(model, 'googlenet')
+        model = model(in_channels=3, num_classes=7)
+        #print(torch.cuda.is_available())
+        #print(torch.cuda.device_count())
+        state = torch.load(emotion_model_path, map_location='cpu')
         model.load_state_dict(state['net'])
 
         #model.cuda()
@@ -88,7 +92,7 @@ def fun(in_path, out_image_path,
     # loading models
     face_detection = load_detection_model(detection_model_path)
 
-    info_name = ['file name', 'face_x', 'face_y', 'face_w', 'face_h', 'emotion']
+    info_name = ['file name', 'face_x', 'face_y', 'face_w', 'face_h', 'emotion', 'angry_prob', 'disgust_prob', 'fear_prob', 'happy_prob', 'sad_prob', 'surprise_prob', 'neutral_prob']
 
     input_image_root = in_path
     output_image_root = out_image_path
@@ -221,13 +225,19 @@ def fun(in_path, out_image_path,
                         cv2.putText(image_cap_ori, 'sad', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,255), 1, cv2.LINE_AA)
                     elif emotion_text == 'happy':
                         cv2.rectangle(image_cap_ori, (x, y), (x+w, y+h), (255,255,0), 4)
-                        cv2.putText(image_cap_ori, 'happy', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1,(255,255,0), 1, cv2.LINE_AA)
+                        cv2.putText(image_cap_ori, 'happy', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1, (255,255,0), 1, cv2.LINE_AA)
                     elif emotion_text == 'surprise':
                         cv2.rectangle(image_cap_ori, (x, y), (x+w, y+h), (0,255,255), 4)
-                        cv2.putText(image_cap_ori, 'surprise', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1,(0,255,255), 1, cv2.LINE_AA)
+                        cv2.putText(image_cap_ori, 'surprise', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,255), 1, cv2.LINE_AA)
+                    elif emotion_text == 'disgust':
+                        cv2.rectangle(image_cap_ori, (x, y), (x+w, y+h), (0,0,0), 4)
+                        cv2.putText(image_cap_ori, 'disgust', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 1, cv2.LINE_AA)
+                    elif emotion_text == 'fear':
+                        cv2.rectangle(image_cap_ori, (x, y), (x+w, y+h), (255,0,255), 4)
+                        cv2.putText(image_cap_ori, 'fear', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1, (255,0,255), 1, cv2.LINE_AA)
                     else:
                         cv2.rectangle(image_cap_ori, (x, y), (x+w, y+h), (0,255,0), 4)
-                        cv2.putText(image_cap_ori, 'neutral', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1,(0,255,0), 1, cv2.LINE_AA)
+                        cv2.putText(image_cap_ori, 'neutral', (int(float(x+w/2-43)), y-10), cv2.FONT_HERSHEY_DUPLEX, 1, (0,255,0), 1, cv2.LINE_AA)
 
                 if save_info:
                     op_info_list = [ori_image_name,
@@ -237,6 +247,8 @@ def fun(in_path, out_image_path,
                         op_info_list[i] = str(op_info_list[i])
                     if detect_emo:
                         op_info_list.append(emotion_text)
+                        for prob in emotion_prediction:
+                            op_info_list.append(prob)
                     csv_writer.writerow(op_info_list)
 
             if save_image:
