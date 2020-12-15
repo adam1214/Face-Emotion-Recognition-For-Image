@@ -70,7 +70,7 @@ def fun(in_path, out_image_path,
         emotion_offsets = (20, 40)
         # loading models
 
-        state = torch.load(emotion_model_path)
+        state = torch.load(emotion_model_path, map_location='cpu' )
         model.load_state_dict(state['net'])
 
         #model.cuda()
