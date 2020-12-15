@@ -1,3 +1,3 @@
-﻿file name,face_x,face_y,face_w,face_h,emotion
-1080pJPG.jpg,703.5,75.0,339.0,339.0,sad
-﻿1080p_PNG.jpg,108.0,273.0,444.0,444.0,sad
+﻿file name,face_x,face_y,face_w,face_h,emotion,angry_prob,disgust_prob,fear_prob,happy_prob,sad_prob,surprise_prob,neutral_prob
+1080pJPG.jpg,703.5,75.0,339.0,339.0,angry,0.8670239,4.333521e-05,0.11170835,0.00035135736,0.018088553,7.0791316e-06,0.0027774994
+﻿1080p_PNG.jpg,108.0,273.0,444.0,444.0,fear,0.11407303,0.00071123516,0.48395184,0.0042804275,0.28057387,0.00014847516,0.116261154
