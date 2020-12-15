@@ -1,0 +1,38 @@
+stages:
+  - exe_env_build
+  - test_env_build
+  - test
+
+exe_env_build:
+  stage: exe_env_build
+  tags:
+    - "shell"
+  script:
+    - echo "build docker image..."
+    - sudo docker build -t biicgitlab.ee.nthu.edu.tw:5050/prod/engineer/fer_image .
+    - echo "docker image has been built"
+
+test_env_build:
+  stage: test_env_build
+  tags:
+    - "shell"
+  script:
+    - echo "build pytest env..."
+    - pip install pytest
+    - pip install pytest-html
+    - pip install pytest-sugar
+    - pip install pytest-icdiff
+
+
+test:
+  stage: test
+  tags:
+    - "shell"
+  script:
+    - echo "pytest..."
+    - py.test -vv --html=report.html --self-contained-html --durations=6
+    - echo "Finish"
+  artifacts:
+    paths:
+      - ./report.html
+
