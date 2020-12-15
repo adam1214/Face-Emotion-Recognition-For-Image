@@ -64,7 +64,7 @@ def fun(in_path, out_image_path,
     # parameters for loading data and images
     detection_model_path = model_path +  '/haarcascade_frontalface_default.xml'
     if detect_emo:
-        emotion_model_path = model_path + '/resmasking_dropout1__resmasking_dropout1_128_2020Aug29_21.55'
+        emotion_model_path = model_path + '/googlenet__googlenetwei__2020Aug29_16.21'
         emotion_labels = get_labels('fer2013')
         print(emotion_labels)
         emotion_offsets = (20, 40)
